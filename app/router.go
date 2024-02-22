@@ -1,11 +1,11 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/ipkalid/order-api/handler"
 )
 
 func LoadRouter() http.Handler {
@@ -13,13 +13,17 @@ func LoadRouter() http.Handler {
 
 	router.Use(middleware.Logger)
 
-	router.Get("/", basic)
+	router.Route("/order", loadOrderRoute)
 
 	return router
 }
 
-func basic(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+func loadOrderRoute(router chi.Router) {
+	orderRouter := &handler.Order{}
+	router.Post("/ ", orderRouter.Create)
+	router.Get("/", orderRouter.List)
 
-	fmt.Fprintf(w, "hello world\n")
+	router.Get("/{id}", orderRouter.GetByID)
+	router.Put("/{id}", orderRouter.UpdateByID)
+	router.Delete("/{id}", orderRouter.DeleteByID)
 }
