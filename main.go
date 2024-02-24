@@ -1,7 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"os"
+	"os/signal"
 
 	"github.com/ipkalid/order-api/app"
 )
@@ -9,9 +11,13 @@ import (
 func main() {
 	app := app.NewApp()
 
-	fmt.Println("app start at http://localhost:3000")
-	err := app.Start()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+
+	defer cancel()
+
+	err := app.Start(ctx)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		panic(err)
+		// fmt.Printf("Error: %v\n", err)
 	}
 }
